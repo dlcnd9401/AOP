@@ -1,4 +1,4 @@
-package com.java.test;
+package com.java.test.dao;
 
 import java.util.HashMap;
 import org.slf4j.Logger;

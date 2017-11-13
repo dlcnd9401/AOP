@@ -1,4 +1,4 @@
-package com.java.test;
+package com.java.test.aop;
 
 import java.util.HashMap;
 
@@ -123,15 +123,34 @@ public class TestAOP {
 //		}
 //	}
 	
-	@Pointcut("within(com.java.test..*)")
-	public void m(){}
+	@Pointcut("within(com.java.test.controller..*)")
+	public void controllerMethod(){}
 	
-	@Around("m()")
-	public Object around(ProceedingJoinPoint jp) throws Throwable{
+	@Pointcut("within(com.java.test.service..*)")
+	public void serviceMethod(){}
+	
+	@Pointcut("within(com.java.test.dao..*)")
+	public void daoMethod(){}
+	
+	@Around("controllerMethod()")
+	public Object controllerAround(ProceedingJoinPoint jp) throws Throwable{
+		 return runMethod(jp);
+	}
+	
+	@Around("serviceMethod()")
+	public Object serviceAround(ProceedingJoinPoint jp) throws Throwable{
+		 return runMethod(jp);
+	}
+	
+	@Around("daoMethod()")
+	public Object daoAround(ProceedingJoinPoint jp) throws Throwable{
+		 return runMethod(jp);
+	}
+	
+	private Object runMethod(ProceedingJoinPoint jp) throws Throwable{
 		String nm = jp.getSignature().toShortString();
 		long st = System.currentTimeMillis();
 		Object[] obs = jp.getArgs();
-//		logger.info("Start : " + nm);
 		for(int i = 0; i < obs.length; i++){
 			if(obs[i] instanceof HashMap){
 				logger.info("Start : " + nm + " 인자값 : " + obs[i]);
@@ -152,7 +171,7 @@ public class TestAOP {
 		} finally {
 			long en = System.currentTimeMillis();
 			logger.info(nm + " 경과 시간 : " + (en - st));
-		} 
+		}
 	}
 	
 }

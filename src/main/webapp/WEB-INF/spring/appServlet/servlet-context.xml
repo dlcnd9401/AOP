@@ -26,6 +26,6 @@
 	<context:component-scan base-package="com.java.test" />
 	
 	<aop:aspectj-autoproxy />
-	<beans:bean id="testAOP" class="com.java.test.TestAOP" />
+	<beans:bean id="testAOP" class="com.java.test.aop.TestAOP" />
 	
 </beans:beans>
