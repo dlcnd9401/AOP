@@ -2,6 +2,8 @@ package com.java.test.aop;
 
 import java.util.HashMap;
 
+import javax.servlet.http.HttpSession;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -123,55 +125,87 @@ public class TestAOP {
 //		}
 //	}
 	
-	@Pointcut("within(com.java.test.controller..*)")
-	public void controllerMethod(){}
+	@Pointcut("execution(* com.java.test.controller.MainController.menu(..))")
+	public void menuMethod(){}
 	
-	@Pointcut("within(com.java.test.service..*)")
-	public void serviceMethod(){}
+	@Pointcut("execution(* com.java.test.controller.MainController.where(..))")
+	public void whereMethod(){}
 	
-	@Pointcut("within(com.java.test.dao..*)")
-	public void daoMethod(){}
-	
-	@Around("controllerMethod()")
+	@Around("menuMethod() || whereMethod()")
 	public Object controllerAround(ProceedingJoinPoint jp) throws Throwable{
-		 return runMethod(jp);
-	}
-	
-	@Around("serviceMethod()")
-	public Object serviceAround(ProceedingJoinPoint jp) throws Throwable{
-		 return runMethod(jp);
-	}
-	
-	@Around("daoMethod()")
-	public Object daoAround(ProceedingJoinPoint jp) throws Throwable{
-		 return runMethod(jp);
-	}
-	
-	private Object runMethod(ProceedingJoinPoint jp) throws Throwable{
-		String nm = jp.getSignature().toShortString();
-		long st = System.currentTimeMillis();
-		Object[] obs = jp.getArgs();
-		for(int i = 0; i < obs.length; i++){
-			if(obs[i] instanceof HashMap){
-				logger.info("Start : " + nm + " 인자값 : " + obs[i]);
-			}
-		}
 		try {
-			Object obj = jp.proceed();
-			HashMap<String, Object> map = new HashMap<String, Object>();
-			if(obj instanceof HashMap){
-				map.put("key", "변경된 값");
-				Object obj2 = (Object) map;
-				logger.info("End   : " + nm + " 리턴값 : " + obj2);
-				return obj2;
-			}else{
-				logger.info("End   : " + nm + " 리턴값 : " + obj);
-				return obj;
+			String nm = jp.toShortString();
+			
+			Object[] obs = jp.getArgs();
+			for(int i = 0; i < obs.length; i++){
+				if(obs[i] instanceof HttpSession){
+					HttpSession session = (HttpSession) obs[i];
+					HashMap<String, Object> map 
+						= (HashMap<String, Object>) session.getAttribute("user");
+					logger.info(nm + " --> " + map);
+					if(map == null){
+						Object retVal = "redirect:home";
+						return retVal;
+					}
+				}
 			}
+			
+			Object obj = jp.proceed();
+			return obj;
 		} finally {
-			long en = System.currentTimeMillis();
-			logger.info(nm + " 경과 시간 : " + (en - st));
+			
 		}
 	}
+	
+//	@Pointcut("within(com.java.test.controller..*)")
+//	public void controllerMethod(){}
+//	
+//	@Pointcut("within(com.java.test.service..*)")
+//	public void serviceMethod(){}
+//	
+//	@Pointcut("within(com.java.test.dao..*)")
+//	public void daoMethod(){}
+//	
+//	@Around("controllerMethod()")
+//	public Object controllerAround(ProceedingJoinPoint jp) throws Throwable{
+//		 return runMethod(jp);
+//	}
+//	
+//	@Around("serviceMethod()")
+//	public Object serviceAround(ProceedingJoinPoint jp) throws Throwable{
+//		 return runMethod(jp);
+//	}
+//	
+//	@Around("daoMethod()")
+//	public Object daoAround(ProceedingJoinPoint jp) throws Throwable{
+//		 return runMethod(jp);
+//	}
+	
+//	private Object runMethod(ProceedingJoinPoint jp) throws Throwable{
+//		String nm = jp.getSignature().toShortString();
+//		long st = System.currentTimeMillis();
+//		Object[] obs = jp.getArgs();
+//		for(int i = 0; i < obs.length; i++){
+//			if(obs[i] instanceof HashMap){
+//				logger.info("Start : " + nm + " 인자값 : " + obs[i]);
+//			}
+//		}
+//		try {
+//			Object obj = jp.proceed();
+//			HashMap<String, Object> map = new HashMap<String, Object>();
+//			if(obj instanceof HashMap){
+//				map.put("key", "변경된 값");
+//				Object obj2 = (Object) map;
+//				logger.info("End   : " + nm + " 리턴값 : " + obj2);
+//				return obj2;
+//			}else{
+//				logger.info("End   : " + nm + " 리턴값 : " + obj);
+//				return obj;
+//			}
+//		} finally {
+//			long en = System.currentTimeMillis();
+//			logger.info(nm + " 경과 시간 : " + (en - st));
+//		}
+//	}
 	
 }

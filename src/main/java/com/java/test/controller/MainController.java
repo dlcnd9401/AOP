@@ -39,12 +39,12 @@ public class MainController {
 	}
 	
 	@RequestMapping(value = "/menu", method = RequestMethod.GET)
-	public String menu() {
+	public String menu(HttpSession session) {
 		return "menu";
 	}
 	
 	@RequestMapping(value = "/where", method = RequestMethod.GET)
-	public String where() {
+	public String where(HttpSession session) {
 		return "where";
 	}
 	
