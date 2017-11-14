@@ -10,6 +10,12 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script>
 $(document).ready(function(){
+	
+	$.ajax({url:"jsonData", type:"get"})
+	 .done(function(result){
+		  console.log(result);
+	});
+	
 	$("#logout").on("click", function(){
 		$.ajax({url:"logout", type:"post"})
 		   .done(function(result){

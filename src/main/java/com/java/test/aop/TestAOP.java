@@ -1,6 +1,8 @@
 package com.java.test.aop;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -152,6 +154,37 @@ public class TestAOP {
 			
 			Object obj = jp.proceed();
 			return obj;
+		} finally {
+			
+		}
+	}
+	
+	@Pointcut("execution(* com.java.test.dao.MenuDao.select(..))")
+	public void selectMethod(){}
+	
+	@Around("selectMethod()")
+	public Object daoAround(ProceedingJoinPoint jp) throws Throwable{
+		try {
+			String nm = jp.toShortString();
+			
+			Object[] obs = jp.getArgs();
+			for(int i = 0; i < obs.length; i++){
+				if(obs[i] instanceof HttpSession){
+					HttpSession session = (HttpSession) obs[i];
+					HashMap<String, Object> map 
+						= (HashMap<String, Object>) session.getAttribute("user");
+					logger.info(nm + " --> " + map);
+					if("gudi@goodee.co.kr".equals(map.get("email"))){
+						Object obj = jp.proceed();
+						return obj;
+					}
+				}
+			}
+			
+			List<HashMap<String, Object>> resultList 
+				= new ArrayList<HashMap<String, Object>>();
+			Object retVal = resultList;
+			return retVal;
 		} finally {
 			
 		}

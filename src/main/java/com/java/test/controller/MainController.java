@@ -19,6 +19,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.java.test.dao.MenuDaoInterface;
+
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
@@ -72,6 +74,24 @@ public class MainController {
 		jsonObject = JSONObject.fromObject(JSONSerializer.toJSON(resultMap));
 		try {
 			session.invalidate();
+			resp.getWriter().write(jsonObject.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Autowired
+	MenuDaoInterface mdi;
+	
+	@RequestMapping(value = "/jsonData", method = RequestMethod.GET)
+	public void jsonData(HttpServletResponse resp, HttpSession session) {
+		HashMap<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("data", mdi.select(session));
+		
+		resp.setContentType("application/json; charset=utf-8");
+		JSONObject jsonObject = new JSONObject();
+		jsonObject = JSONObject.fromObject(JSONSerializer.toJSON(resultMap));
+		try {
 			resp.getWriter().write(jsonObject.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
